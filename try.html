@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery with Autoplay</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 70vh;  /* Adjust height for responsiveness */
+            background: white;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .gallery-item {
+            display: grid;
+            grid-template-areas: 
+                "a b b"
+                "a c d"
+                "e f d";
+            grid-template-rows: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: visibility 0s, opacity 0.5s ease;
+        }
+
+        .gallery-item.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .gallery-item div {
+            position: relative;
+            background: #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .gallery-item div img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item div:nth-child(1) { grid-area: a; }
+        .gallery-item div:nth-child(2) { grid-area: b; }
+        .gallery-item div:nth-child(3) { grid-area: c; }
+        .gallery-item div:nth-child(4) { grid-area: d; }
+        .gallery-item div:nth-child(5) { grid-area: e; }
+        .gallery-item div:nth-child(6) { grid-area: f; }
+
+        .nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .nav.left {
+            left: 20px;
+        }
+
+        .nav.right {
+            right: 20px;
+        }
+
+        .indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .indicators div {
+            width: 12px;
+            height: 12px;
+            background: #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .indicators .active {
+            background: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .gallery-container {
+                height: 60vh; /* Adjust height for smaller screens */
+            }
+
+            .gallery-item {
+                grid-template-areas: 
+                    "a a a"
+                    "b c d"
+                    "e f d"; /* Make gallery items more stacked on mobile */
+            }
+
+            .gallery-item div {
+                height: 100%;
+            }
+
+            .nav {
+                width: 40px;
+                height: 40px;
+            }
+
+            .indicators div {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-container {
+                height: 50vh; /* Further adjust height for very small screens */
+            }
+
+            .gallery-item {
+                grid-template-areas: 
+                    "a a a"
+                    "b b c"
+                    "d e f"; /* Make gallery more vertical on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery-container">
+        <button class="nav left" id="prevButton">&#8249;</button>
+        <div class="gallery-item active">
+            <div><img src="/img/1.png" alt="Image 1"></div>
+            <div><img src="/img/2.png" alt="Image 2"></div>
+            <div><img src="/img/3.png" alt="Image 3"></div>
+            <div><img src="/img/4.png" alt="Image 4"></div>
+            <div><img src="/img/5.png" alt="Image 5"></div>
+            <div><img src="/img/6.png" alt="Image 6"></div>
+        </div>
+        <div class="gallery-item">
+            <div><img src="/img/7.png" alt="Image 7"></div>
+            <div><img src="/img/8.png" alt="Image 8"></div>
+            <div><img src="/img/9.png" alt="Image 9"></div>
+            <div><img src="/img/10.png" alt="Image 10"></div>
+            <div><img src="/img/11.png" alt="Image 11"></div>
+            <div><img src="/img/12.png" alt="Image 12"></div>
+        </div>
+        <button class="nav right" id="nextButton">&#8250;</button>
+        <div class="indicators">
+            <div class="active" data-index="0"></div>
+            <div data-index="1"></div>
+        </div>
+    </div>
+
+    <script>
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const indicators = document.querySelectorAll('.indicators div');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const totalSlides = galleryItems.length;
+        let currentIndex = 0;
+        let autoplayInterval;
+
+        function updateGallery() {
+            // Hide all slides
+            galleryItems.forEach((item, index) => {
+                item.classList.toggle('active', index === currentIndex);
+            });
+
+            // Update indicators
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentIndex);
+            });
+        }
+
+        function startAutoplay() {
+            autoplayInterval = setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateGallery();
+            }, 3000); // Change slide every 3 seconds
+        }
+
+        function stopAutoplay() {
+            clearInterval(autoplayInterval);
+        }
+
+        // Event listeners for manual navigation
+        prevButton.addEventListener('click', () => {
+            stopAutoplay();
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateGallery();
+            startAutoplay(); // Restart autoplay
+        });
+
+        nextButton.addEventListener('click', () => {
+            stopAutoplay();
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateGallery();
+            startAutoplay(); // Restart autoplay
+        });
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                stopAutoplay();
+                currentIndex = index;
+                updateGallery();
+                startAutoplay(); // Restart autoplay
+            });
+        });
+
+        // Start autoplay when the page loads
+        startAutoplay();
+    </script>
+</body>
+</html>
