@@ -317,6 +317,8 @@ body {
 
   /* market place */
 
+
+
   /* Container kotak */
 .image-box {
   display: block;
@@ -344,6 +346,7 @@ body {
 }
 .marketplace{
   margin-top: -11rem;
+  
 }
 .market {
   padding-top: 14rem;
@@ -457,6 +460,14 @@ body {
 }
 
 @media (max-width: 480px) {
+  body {
+    overflow-x: hidden;
+  }
+  .all{
+    width: 95%;
+    margin: auto;
+    overflow-x: hidden;
+  }
   .gallery-container {
       height: 50vh; /* Further adjust height for very small screens */
   }
@@ -467,4 +478,24 @@ body {
           "b b c"
           "d e f"; /* Make gallery more vertical on small screens */
   }
+  .marketplace a{
+    width: 90%;
+    align-self: center;
+    margin-left: 25px;
+  }
+.whatsapp-btn:hover {
+    background-color: #128C7E; /* Darker green on hover */
+}
+.navbar{
+  width: 100%;
+  left: 0;
+  z-index: 999;
+}
+.about iframe{
+  width: 90%;
+  margin: auto;
+  margin-left: 20px;
+}
+
+
 }
